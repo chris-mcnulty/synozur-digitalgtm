@@ -1,0 +1,23 @@
+.env
+.env.local
+
+# Real prospect data lives in OneDrive, not in the repo.
+# The repo only contains schema, template, and an anonymized example.
+prospects/*.md
+!prospects/_schema.md
+!prospects/_template.md
+!prospects/_example-jane-smith.md
+
+# Local Claude state
+.claude/local/
+.claude/cache/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
