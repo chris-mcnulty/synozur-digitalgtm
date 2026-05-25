@@ -26,15 +26,26 @@ in Outlook.
 
 ## State machine (lives in each prospect's YAML frontmatter as `state:`)
 
+v1 (this harness):
+
 ```
-new → researched → draft_pending_approval → approved → sent → awaiting_reply
-                                       │                              │
-                                       └→ rejected → researched       ├→ replied → composer drafts reply
-                                                                      ├→ cadence_step_due → cadence auto-fires templated step
-                                                                      ├→ dormant
-                                                                      └→ meeting_booked
+new → researched → draft_pending_approval → sent → awaiting_reply
+                                                          │
+                                                          ├→ replied → composer drafts a reply
+                                                          ├→ cadence_step_due → cadence queues the next templated step as a draft (state goes back to draft_pending_approval)
+                                                          ├→ dormant
+                                                          └→ meeting_booked
 disqualified is terminal. needs_review is the error state.
 ```
+
+Notes:
+
+- In v1, the human's "click Send in Outlook" IS the approval. Cadence
+  detects the send and transitions `draft_pending_approval → sent`
+  directly. There is no separate `approved`/`rejected` state in v1.
+- `approved` and `rejected` appear in `docs/architecture.md` as
+  intermediate states for a future approval UI (v2+). They are not
+  used by any v1 agent.
 
 ## Kill switches (always honored)
 
@@ -55,16 +66,31 @@ extraction prompt at `skills/outbound-voice/voice-dna-extract.md`.
 
 ## Approval gate
 
-Composer writes drafts to two places:
-1. The prospect MD file's `## Draft (pending approval)` section
-2. The user's Outlook Drafts folder (via Microsoft Graph)
+In v1, the Composer writes drafts to **only one place**: the prospect
+MD file's `## Draft (pending approval)` section. No Outlook write tool
+is wired yet (see `skills/outlook-ops/SKILL.md` — current default is
+Option C, the markdown-to-Outlook sync bridge).
 
-Cadence never sends without a draft having state `approved` (set by the
-human moving it out of Drafts and clicking Send, OR by a future approval
-UI flipping the MD file's state field). Templated cadence steps from
-`skills/cadence-rules/templates/` are pre-approved at the template level
-and can auto-fire only when all guardrails in `skills/kill-switches/`
-and `skills/compliance/` pass.
+The flow:
+
+1. Composer writes the draft to the MD file and sets
+   `state: draft_pending_approval`.
+2. A separate step (the `tools/sync_drafts.py` bridge when wired, or
+   the operator manually until then) creates a matching Outlook Draft
+   in the operator's mailbox.
+3. The operator opens Outlook, reviews, and clicks Send. **That click
+   is the approval.**
+4. Cadence detects the send by searching sent-items for the matching
+   `draft_subject` and transitions the lead from
+   `draft_pending_approval` straight to `sent`.
+
+Cadence **never auto-sends** in v1. Templated cadence steps from
+`skills/cadence-rules/templates/` are pre-approved at the template
+level only in the sense that their wording was reviewed via PR. When a
+template step comes due, Cadence renders it and appends it to the
+prospect MD file as the next `## Draft (pending approval)` — under the
+same guardrails in `skills/kill-switches/` and `skills/compliance/`. A
+human still clicks Send. Auto-send is a future flag, not v1 behavior.
 
 ## Output style
 

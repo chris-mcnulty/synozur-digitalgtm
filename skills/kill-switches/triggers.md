@@ -57,6 +57,11 @@ list, not to keep sending.
 - `AGENTS_PAUSED` → set the env var to false; agents pick up on next tick.
 - Campaign auto-pause → operator reviews, sets a `paused: false` in the
   campaign config (TODO: campaign config file), restarts cadence.
-- `do_not_contact: true` → permanent. Only manually clear via a PR with
-  documented reason; never the agents themselves.
+- `do_not_contact: true` → effectively permanent. Real prospect files
+  live in OneDrive (gitignored), not in git, so this is not cleared via
+  a PR. A human operator edits the prospect file in
+  `$PROSPECT_DIR/` directly, sets `do_not_contact: false`, and appends a
+  one-line entry to `## Audit` explaining why (e.g. "2026-06-01 [chris]
+  cleared do_not_contact: prior opt-out was a misclassified auto-reply,
+  prospect confirmed at conference"). Agents never clear this flag.
 - Send caps → wait for the window to roll. Do not bypass.

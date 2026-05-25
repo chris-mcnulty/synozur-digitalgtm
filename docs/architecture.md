@@ -4,6 +4,22 @@ Three Claude agents that move a lead from cold list to booked reply, with the
 CRM as the system of record, a human approving every first-touch message
 before it sends, and pre-approved cadence steps auto-firing under hard guardrails.
 
+> **Scope.** This document describes the **target architecture** —
+> where the system lands once we've outgrown the first-generation
+> harness. The v1 harness in this repo intentionally diverges in two
+> places to ship faster:
+>
+> 1. **System of record.** v1 stores per-prospect state in markdown
+>    files in a OneDrive-synced folder, not in HubSpot/Salesforce.
+>    The CRM-as-database design below is v2+.
+> 2. **Send autonomy.** v1 is draft-only. Cadence never auto-sends; a
+>    human clicks Send in Outlook for every outbound, including
+>    templated cadence steps. Auto-send under guardrails is v2+.
+>
+> The runbook for what is actually shipping today lives in
+> `docs/harness-v1.md`. Read that before this doc unless you want the
+> rationale and the future shape.
+
 ## Design principles
 
 1. **The CRM is the database.** No parallel store. Every fact about a lead

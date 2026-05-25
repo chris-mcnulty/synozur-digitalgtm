@@ -30,8 +30,11 @@ runs via one of three options (v1 supports option C):
 
 **Option A — Graph SDK helper script.** Add a small Python helper at
 `tools/outlook_draft.py` that authenticates to Graph (delegated auth,
-the user's signed-in identity) and POSTs to `/me/messages?$filter=...`
-to create a draft. The Composer invokes the helper via a tool wrapper.
+the user's signed-in identity) and creates a draft via
+`POST /me/messages` with a JSON body containing `subject`, `body`, and
+`toRecipients`. Messages created via this endpoint default to draft
+state (the `isDraft` flag is set true by Graph until the message is
+explicitly sent). The Composer invokes the helper via a tool wrapper.
 Requires app registration in the Synozur tenant with `Mail.ReadWrite`.
 
 **Option B — A write-side MCP.** Wire a Graph MCP server (e.g. an

@@ -4,8 +4,12 @@ First-generation harness for autonomous sales prospecting using three
 interlocking Cowork agents.
 
 - **Prospector** researches a new lead, scores ICP fit, writes a dossier.
-- **Composer** drafts a first-touch or reply message in the firm voice,
-  saves it to Outlook Drafts, and queues it for human approval.
+- **Composer** drafts a first-touch or reply message in the firm voice
+  and writes it to the prospect MD file under
+  `## Draft (pending approval)`. In v1 the MD draft is the only thing
+  the Composer writes — a separate sync bridge (or the operator
+  manually) materializes the draft into Outlook Drafts. See
+  `skills/outlook-ops/SKILL.md` for the bridge options.
 - **Cadence** detects replies, schedules follow-ups, fires pre-approved
   templated cadence steps, and decides when to stop.
 

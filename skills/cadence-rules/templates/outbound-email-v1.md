@@ -1,4 +1,5 @@
 ---
+id: outbound-email-v1
 campaign: outbound-email-v1
 description: Default outbound cadence for cold prospects with a recent signal. 3 templated follow-ups after the first-touch human-approved send.
 steps:

@@ -33,13 +33,19 @@ see `_example-jane-smith.md`.
 | `next_step_at` | when in cadence | Cadence | When the next templated step is due |
 | `thread_id` | after first send | Cadence | Outlook conversation ID for reply detection |
 | `sent_at` | after first send | Cadence | Timestamp of first send |
-| `cadence_template_id` | after enrolled | Cadence | Locks the lead to a template version |
-| `do_not_contact` | yes | Cadence | Permanent if true |
+| `cadence_template_id` | after enrolled | Cadence | Locks the lead to a template version. Must equal the `id:` in the frontmatter of one of the files in `skills/cadence-rules/templates/` (also equals the filename stem). |
+| `draft_subject` | when drafted | Composer | Subject line of the current `## Draft (pending approval)`. Cadence uses it to match the eventual Outlook send back to the lead via sent-items search. |
+| `do_not_contact` | yes | Cadence / operator | Permanent if true. Cleared only by an operator editing the prospect file directly, with the reason logged in `## Audit`. Never cleared by an agent. |
 | `email_invalid` | optional | Cadence | Set on hard bounce |
 | `icp_score` | after research | Prospector | 1–10 or null |
 | `disqualify_reason` | when disqualified | Prospector | One sentence |
 | `hold_reason` | when held | Composer/Cadence | Why the draft is paused for human review |
 | `re_engage_at` | when dormant | Cadence | When to consider revisiting |
+
+Reply-classification details (category, proposed meeting slots, etc.)
+are written by Cadence into the `## Notes` body section, not into
+frontmatter. Keeping classification out of the schema avoids schema
+drift for what is essentially free-form annotation.
 
 ## Body sections (in order)
 

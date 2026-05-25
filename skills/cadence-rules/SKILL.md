@@ -33,25 +33,42 @@ so the Composer (or a human) can handle it.
 
 ## Template format
 
-Each file in `templates/` has YAML frontmatter:
+Each file in `templates/` describes **one complete cadence** (a series
+of steps under a single campaign), not a single step. The frontmatter
+identifies the cadence and enumerates its steps:
 
 ```yaml
 ---
-id: outbound-email-v1-step-2
-campaign: outbound-email-v1
-step: 2
-days_after_previous: 3
-channel: email
-description: Day-3 nudge that references the original hook.
-variables:
-  - first_name
+id: outbound-email-v1            # stable cadence ID — referenced by
+                                  # prospect frontmatter as
+                                  # cadence_template_id
+campaign: outbound-email-v1      # campaign tag (usually equals id)
+description: Default outbound cadence for cold prospects.
+steps:
+  - id: outbound-email-v1-step-2 # stable per-step ID
+    days_after_previous: 3
+    channel: email
+  - id: outbound-email-v1-step-3
+    days_after_previous: 4
+    channel: email
+  - id: outbound-email-v1-step-4
+    days_after_previous: 7
+    channel: email
+variables:                       # variables any step in this cadence
+  - first_name                   # may reference
   - hook_summary
 ---
 ```
 
-Followed by the body in markdown. Variables are referenced as
-`{first_name}` etc. The Cadence agent fills variables from the prospect's
-MD file frontmatter and dossier sections.
+Below the frontmatter, the body has one `## Step N` section per step
+in `steps`, containing the templated copy for that step. Variables are
+referenced as `{first_name}` etc. The Cadence agent fills variables
+from the prospect's MD file frontmatter and dossier sections.
+
+When a prospect's frontmatter says `cadence_template_id: outbound-email-v1`,
+the Cadence agent looks up `templates/outbound-email-v1.md`, finds the
+next step (per `steps[]` and the lead's `touch_count`), and renders
+the corresponding `## Step N` body section.
 
 ## Adding a new template
 
